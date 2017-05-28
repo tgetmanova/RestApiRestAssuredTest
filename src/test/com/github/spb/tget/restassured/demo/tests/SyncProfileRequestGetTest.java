@@ -7,6 +7,8 @@ import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static io.restassured.RestAssured.given;
 
 public  class SyncProfileRequestGetTest {
@@ -14,9 +16,9 @@ public  class SyncProfileRequestGetTest {
     @BeforeClass
     public static void setupRestAssured() {
 
-        RestAssured.port = 2828;
-        RestAssured.basePath = "/api/TestApi";
-        RestAssured.baseURI = "http://localhost/";
+        RestAssured.port = 8080;
+        RestAssured.basePath = "/profiles";
+        RestAssured.baseURI = "http://localhost";
     }
 
     @Test
@@ -30,7 +32,7 @@ public  class SyncProfileRequestGetTest {
     public void newlyCreatedProfile_ShouldBeReturned() {
         SyncProfileRequest profile = SyncProfileRequestUtils.generateValidSyncProfileRequest();
 
-        RestAssured.given()
+        given()
                 .contentType("application/json")
                 .and().body(profile)
                 .post();
@@ -38,8 +40,18 @@ public  class SyncProfileRequestGetTest {
         given()
                 .when().get(profile.getUserId().toString())
                 .then().statusCode(200)
-                        .and().body("Locale", Matchers.equalTo(profile.getLocale()))
-                        .and().body("CountryIsoCode", Matchers.equalTo(profile.getCountryIsoCode()));
+                .and().body("locale", Matchers.equalTo(profile.getLocale().toString()))
+                .and().body("countryIsoCode", Matchers.equalTo(profile.getCountryIsoCode().toString()))
+                .and().body("userId", Matchers.equalTo(profile.getUserId().toString()));
     }
 
+    @Test
+    public void nonExistingProfile_ShouldReturn404NotFound() {
+        String nonExistingUserId = UUID.randomUUID().toString();
+
+        given()
+                .when().get(nonExistingUserId)
+                .then().statusCode(404)
+                .and().body(Matchers.containsString(String.format("Profile with ID: %s is not found", nonExistingUserId)));
+    }
 }
