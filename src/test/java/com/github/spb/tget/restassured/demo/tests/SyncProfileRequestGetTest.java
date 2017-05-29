@@ -2,24 +2,14 @@ package com.github.spb.tget.restassured.demo.tests;
 
 import com.github.spb.tget.restassured.demo.tests.utils.SyncProfileRequest;
 import com.github.spb.tget.restassured.demo.tests.utils.SyncProfileRequestUtils;
-import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 
-public  class SyncProfileRequestGetTest {
-
-    @BeforeClass
-    public static void setupRestAssured() {
-
-        RestAssured.port = 8080;
-        RestAssured.basePath = "/profiles";
-        RestAssured.baseURI = "http://localhost";
-    }
+public  class SyncProfileRequestGetTest extends SyncProfileRequestBaseTest {
 
     @Test
     public void getAllProfiles_ShouldReturn200Ok() {
